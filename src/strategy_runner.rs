@@ -33,6 +33,8 @@ impl StrategyRunner {
             strategy.process(&data, &mut self.state)?;
         }
 
+        //this.copy_to_background_worker(data);
+
         Ok(())
     }
 
