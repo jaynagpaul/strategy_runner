@@ -1,6 +1,7 @@
 use std::{sync::mpsc, thread};
 
 use crate::{
+    background_manager::BackgroundManager,
     event_loop::EventLoop,
     stubs::{DataPacket, StrategyFn},
     BackgroundFn, Error, ExchangeListener, StrategyState,
@@ -11,11 +12,13 @@ pub struct StrategyRunner {
     state: StrategyState,
 
     strategies: Vec<Box<dyn StrategyFn>>,
+    background_manager: BackgroundManager,
 }
 
 impl StrategyRunner {
     pub fn run(&mut self) -> Result<(), Error> {
         self.setup_background_worker();
+
         loop {
             let data = self.event_loop.poll();
             self.dispatch(data)?;

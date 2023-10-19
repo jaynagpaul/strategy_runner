@@ -20,6 +20,6 @@ pub trait StrategyFn {
     fn process(&mut self, data: &DataPacket, state: &mut StrategyState) -> Result<(), Error>;
 }
 
-pub trait BackgroundFn {
-    fn process(&mut self, data: DataPacket) -> Result<(), Error>;
+pub trait BackgroundFn: Send {
+    fn process(&mut self, data: &DataPacket) -> Result<(), Error>;
 }
