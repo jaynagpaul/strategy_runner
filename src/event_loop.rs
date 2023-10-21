@@ -6,7 +6,7 @@ pub(crate) struct EventLoop {
 }
 
 impl EventLoop {
-    pub(crate) fn register_exchange(&mut self, exchange: ExchangeListener) {
+    pub(crate) fn add_exchange(&mut self, exchange: ExchangeListener) {
         self.listeners.push(exchange);
     }
 

@@ -3,10 +3,7 @@ use std::{
     thread::{self, JoinHandle},
 };
 
-use crate::{
-    stubs::{BackgroundFn, DataPacket},
-    Error,
-};
+use crate::{strategy_runner::BackgroundFn, stubs::DataPacket, Error};
 
 pub(crate) enum BackgroundMessage {
     Data(DataPacket),
@@ -14,12 +11,12 @@ pub(crate) enum BackgroundMessage {
 }
 
 pub(crate) struct BackgroundManager {
-    // thread_handle: JoinHandle,
+    thread_handle: JoinHandle<()>,
     sender: mpsc::Sender<BackgroundMessage>,
 }
 
 impl BackgroundManager {
-    fn start(mut functions: Vec<Box<dyn BackgroundFn>>) -> Self {
+    pub fn start(mut functions: Vec<Box<dyn BackgroundFn>>) -> Self {
         let (sender, receiver) = mpsc::channel();
 
         let thread_handle = thread::spawn(move || loop {
@@ -27,18 +24,23 @@ impl BackgroundManager {
             match &message {
                 BackgroundMessage::Data(data) => {
                     for function in &mut functions {
+                        // TODO: how should we handle errors.
                         function.process(data).unwrap();
-                        todo!()
                     }
                 }
-                BackgroundMessage::HealthCheck => {}
+                BackgroundMessage::HealthCheck => {
+                    println!("Background health check");
+                }
             }
         });
 
-        Self { sender }
+        Self {
+            thread_handle,
+            sender,
+        }
     }
 
-    fn send(&self, message: BackgroundMessage) -> Result<(), Error> {
+    pub fn send(&self, message: BackgroundMessage) -> Result<(), Error> {
         self.sender.send(message).map_err(|_| todo!())
     }
 }

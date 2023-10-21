@@ -9,17 +9,8 @@ pub struct ExchangeListener {}
 
 impl ExchangeListener {
     pub fn next(&mut self) -> Option<DataPacket> {
-        unimplemented!()
+        Some(DataPacket::new())
     }
 }
 
 pub type Orderbook = ();
-
-// TODO: these aren't stubs and should be defined here
-pub trait StrategyFn {
-    fn process(&mut self, data: &DataPacket, state: &mut StrategyState) -> Result<(), Error>;
-}
-
-pub trait BackgroundFn: Send {
-    fn process(&mut self, data: &DataPacket) -> Result<(), Error>;
-}
