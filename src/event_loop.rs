@@ -27,3 +27,16 @@ impl EventLoop {
         }
     }
 }
+
+#[test]
+fn test_basic() {
+    let exchange_listener = ExchangeListener::new();
+
+    let mut event_loop = EventLoop::default();
+
+    event_loop.add_exchange(exchange_listener);
+
+    let event = event_loop.poll();
+
+    assert_eq!(event, DataPacket::new());
+}

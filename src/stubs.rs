@@ -8,6 +8,10 @@ pub type DataPacket = String;
 pub struct ExchangeListener {}
 
 impl ExchangeListener {
+    pub fn new() -> Self {
+        Self {}
+    }
+
     pub fn next(&mut self) -> Option<DataPacket> {
         Some(DataPacket::new())
     }
