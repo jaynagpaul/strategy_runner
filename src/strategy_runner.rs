@@ -21,10 +21,26 @@ pub struct StrategyRunner {
 
     strategies: Vec<Box<dyn StrategyFn>>,
     background_manager: BackgroundManager,
+    triggers: Vec<Box<dyn Event>>
 }
 
 pub trait StrategyFn {
-    fn process(&mut self, data: &DataPacket, state: &mut StrategyState) -> Result<(), Error>;
+    // fn process(&mut self, data: &DataPacket, state: &mut StrategyState) -> Result<(), Error>;
+    fn process(&mut self, map: Bitmap) -> Result<(), Error>;
+}
+
+pub struct TestStrategy {
+    trigger_mask: Bitmap<u256>,
+}
+impl StrategyFn for TestStrategy {
+    fn process(&mut self, map: Bitmap) -> Result<(), Error> {
+        let and = if(self.trigger_mask.bitand(map));
+        if !and.is_empty {
+            if and.get(1) {
+                // do some function
+            }
+        }
+    }
 }
 
 pub trait BackgroundFn: Send {
