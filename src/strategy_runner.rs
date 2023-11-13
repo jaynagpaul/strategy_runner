@@ -1,10 +1,8 @@
-use std::{sync::mpsc, thread};
-
 use crate::{
     background_manager::{BackgroundManager, BackgroundMessage},
-    event_loop::{self, EventLoop},
+    event_loop::EventLoop,
     stubs::DataPacket,
-    Error, ExchangeListener, StrategyState,
+    Error, ExchangeListener, StrategyState, Triggers,
 };
 
 #[derive(Default)]
@@ -21,26 +19,12 @@ pub struct StrategyRunner {
 
     strategies: Vec<Box<dyn StrategyFn>>,
     background_manager: BackgroundManager,
-    triggers: Vec<Box<dyn Event>>
 }
 
 pub trait StrategyFn {
-    // fn process(&mut self, data: &DataPacket, state: &mut StrategyState) -> Result<(), Error>;
-    fn process(&mut self, map: Bitmap) -> Result<(), Error>;
-}
+    fn process(&mut self, triggers: Triggers, state: &StrategyState) -> Result<(), Error>;
 
-pub struct TestStrategy {
-    trigger_mask: Bitmap<u256>,
-}
-impl StrategyFn for TestStrategy {
-    fn process(&mut self, map: Bitmap) -> Result<(), Error> {
-        let and = if(self.trigger_mask.bitand(map));
-        if !and.is_empty {
-            if and.get(1) {
-                // do some function
-            }
-        }
-    }
+    fn triggers(&self) -> Triggers;
 }
 
 pub trait BackgroundFn: Send {
@@ -66,11 +50,19 @@ impl StrategyRunner {
     }
 
     fn dispatch(&mut self, data: DataPacket) -> Result<(), Error> {
+        let triggers = self.update_state(&data)?;
+
         for strategy in &mut self.strategies {
-            strategy.process(&data, &mut self.state)?;
+            if !(triggers & strategy.triggers()).is_empty() {
+                strategy.process(triggers, &self.state)?;
+            }
         }
 
         self.send_to_worker(data)
+    }
+
+    fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
+        todo!()
     }
 
     fn send_to_worker(&self, data: DataPacket) -> Result<(), Error> {
