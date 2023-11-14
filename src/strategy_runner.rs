@@ -64,12 +64,11 @@ impl StrategyRunner {
     fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
         match data.Data {
             DataEnum::M1(msg) => {
-                let triggers: enumset::EnumSet<crate::Event> =
-                    self.state.orderbook.update(msg.BestAsk, msg.AskAmt);
+                let triggers = self.state.orderbook.update_ask(msg.BestAsk, msg.AskAmt);
                 Ok(triggers)
             }
             DataEnum::M2(msg) => {
-                let triggers = self.state.orderbook.update(msg.BestBid, msg.BidAmt);
+                let triggers = self.state.orderbook.update_bid(msg.BestBid, msg.BidAmt);
                 Ok(triggers)
             }
         }
