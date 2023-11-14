@@ -16,5 +16,3 @@ impl ExchangeListener {
         Some(DataPacket::new())
     }
 }
-
-pub type Orderbook = ();

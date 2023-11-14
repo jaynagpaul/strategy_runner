@@ -62,7 +62,17 @@ impl StrategyRunner {
     }
 
     fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
-        todo!()
+        match data.Data {
+            DataEnum::M1(msg) => {
+                let triggers: enumset::EnumSet<crate::Event> =
+                    self.state.orderbook.update(msg.BestAsk, msg.AskAmt);
+                Ok(triggers)
+            }
+            DataEnum::M2(msg) => {
+                let triggers = self.state.orderbook.update(msg.BestBid, msg.BidAmt);
+                Ok(triggers)
+            }
+        }
     }
 
     fn send_to_worker(&self, data: DataPacket) -> Result<(), Error> {
