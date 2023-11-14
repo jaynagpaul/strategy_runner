@@ -28,8 +28,10 @@ impl Orderbook {
         let best_ask = OrderedFloat(best_ask);
 
         self.asks.insert(best_ask, ask_amt);
-        if best_ask < *self.asks.keys().next().unwrap_or(&OrderedFloat(f64::MAX)) {
-            triggers.insert(Event::NewLowAsk);
+        if let Some(lowest_ask) = self.asks.keys().next() {
+            if &best_ask < lowest_ask {
+                triggers.insert(Event::NewLowAsk);
+            }
         }
 
         triggers
