@@ -2,6 +2,7 @@ use crate::{
     background_manager::{BackgroundManager, BackgroundMessage},
     event_loop::EventLoop,
     stubs::DataPacket,
+    stubs::DataEnum,
     Error, ExchangeListener, StrategyState, Triggers,
 };
 
