@@ -41,7 +41,7 @@ impl ExchangeListener {
 
         let message_type1 = MessageType1 {
             data: "Example data".to_string(),
-            best_ask: rng.gen_range(50.0..200.0),
+            best_ask: rng.gen_range(5.0..200.0),
             ask_amt: rng.gen_range(10.0..100.0),
         };
 

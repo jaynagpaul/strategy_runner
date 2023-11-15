@@ -10,6 +10,10 @@ pub struct Orderbook {
 }
 
 impl Orderbook {
+    pub fn lowest_ask(&self) -> Option<f64> {
+        self.asks.keys().next().map(|x| x.into_inner())
+    }
+
     pub fn update_bid(&mut self, best_bid: f64, bid_amt: f64) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
         let best_bid = OrderedFloat(best_bid);
@@ -29,13 +33,15 @@ impl Orderbook {
 
         let best_ask = OrderedFloat(best_ask);
 
-        self.asks.insert(best_ask, ask_amt);
-        triggers.insert(Event::NewAsk);
         if let Some(lowest_ask) = self.asks.keys().next() {
             if &best_ask < lowest_ask {
                 triggers.insert(Event::NewLowAsk);
             }
+        } else {
+            triggers.insert(Event::NewLowAsk);
         }
+
+        self.asks.insert(best_ask, ask_amt);
 
         triggers
     }

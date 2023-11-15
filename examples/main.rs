@@ -8,11 +8,13 @@ impl StrategyFn for TestStrategy {
     fn process(&mut self, triggers: Triggers, state: &StrategyState) -> Result<(), Error> {
         self.0 += 1;
         println!("Strategy has run {} times", self.0);
+
+        println!("New Low Ask {}", state.orderbook.lowest_ask().unwrap());
         Ok(())
     }
 
     fn triggers(&self) -> Triggers {
-        Event::NewAsk | Event::NewHighBid
+        Event::NewLowAsk | Event::NewHighBid
     }
 }
 
