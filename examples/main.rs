@@ -1,24 +1,28 @@
-use strategy_runner::{Error, Event, StrategyFn, StrategyRunnerBuilder, StrategyState, Triggers};
+use strategy_runner::{
+    Error, Event, ExchangeListener, StrategyFn, StrategyRunnerBuilder, StrategyState, Triggers,
+};
 
-struct TestStrategy;
+struct TestStrategy(u32);
 
 impl StrategyFn for TestStrategy {
     fn process(&mut self, triggers: Triggers, state: &StrategyState) -> Result<(), Error> {
-        println!("TestStrategy::process");
+        self.0 += 1;
+        println!("Strategy has run {} times", self.0);
         Ok(())
     }
 
     fn triggers(&self) -> Triggers {
-        Event::NewHighBid | Event::NewLowAsk
+        Event::NewAsk | Event::NewHighBid
     }
 }
 
 fn main() {
-    let runner = StrategyRunnerBuilder::new()
-        .add_exchange(todo!())
-        .add_background_callback(todo!())
-        .add_strategy(todo!())
-        .build();
+    let mut builder = StrategyRunnerBuilder::new();
+    builder
+        .add_exchange(ExchangeListener {})
+        .add_strategy(Box::new(TestStrategy(0)));
+
+    let mut runner = builder.build();
 
     runner.run().unwrap();
 }

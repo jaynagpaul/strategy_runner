@@ -13,3 +13,5 @@ pub use strategy_state::*;
 pub use triggers::*;
 
 pub(crate) use stubs::*;
+
+pub use stubs::ExchangeListener;

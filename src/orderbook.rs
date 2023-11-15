@@ -26,9 +26,11 @@ impl Orderbook {
 
     pub fn update_ask(&mut self, best_ask: f64, ask_amt: f64) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
+
         let best_ask = OrderedFloat(best_ask);
 
         self.asks.insert(best_ask, ask_amt);
+        triggers.insert(Event::NewAsk);
         if let Some(lowest_ask) = self.asks.keys().next() {
             if &best_ask < lowest_ask {
                 triggers.insert(Event::NewLowAsk);
