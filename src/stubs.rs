@@ -3,23 +3,23 @@
 
 // pub type DataPacket = String;
 pub struct DataPacket {
-    pub Data: DataEnum,
-    pub Exchange: String,
-    pub Channel: String
+    pub data: DataEnum,
+    pub exchange: String,
+    pub channel: String,
 }
 pub enum DataEnum {
     M1(MessageType1),
     M2(MessageType2),
 }
-pub struct MessageType1{
+pub struct MessageType1 {
     pub data: String,
-    pub BestAsk: f64,
-    pub AskAmt: f64,
+    pub best_ask: f64,
+    pub ask_amt: f64,
 }
-pub struct MessageType2{
+pub struct MessageType2 {
     pub data: String,
-    pub BestBid: f64,
-    pub BidAmt: f64,
+    pub best_bid: f64,
+    pub bid_amt: f64,
 }
 
 pub struct ExchangeListener {}
@@ -30,6 +30,22 @@ impl ExchangeListener {
     }
 
     pub fn next(&mut self) -> Option<DataPacket> {
-        Some(DataPacket::new())
+        let message_type1 = MessageType1 {
+            data: "Example data".to_string(),
+            best_ask: 100.0,
+            ask_amt: 50.0,
+        };
+
+        // Use the instance in DataEnum
+        let data_enum = DataEnum::M1(message_type1);
+
+        // Create a DataPacket
+        let data_packet = DataPacket {
+            data: data_enum,
+            exchange: "Binance".to_string(),
+            channel: "Channel-1".to_string(),
+        };
+
+        Some(data_packet)
     }
 }

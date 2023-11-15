@@ -1,8 +1,8 @@
 use crate::{
     background_manager::{BackgroundManager, BackgroundMessage},
     event_loop::EventLoop,
-    stubs::DataPacket,
     stubs::DataEnum,
+    stubs::DataPacket,
     Error, ExchangeListener, StrategyState, Triggers,
 };
 
@@ -63,13 +63,13 @@ impl StrategyRunner {
     }
 
     fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
-        match data.Data {
+        match &data.data {
             DataEnum::M1(msg) => {
-                let triggers = self.state.orderbook.update_ask(msg.BestAsk, msg.AskAmt);
+                let triggers = self.state.orderbook.update_ask(msg.best_ask, msg.ask_amt);
                 Ok(triggers)
             }
             DataEnum::M2(msg) => {
-                let triggers = self.state.orderbook.update_bid(msg.BestBid, msg.BidAmt);
+                let triggers = self.state.orderbook.update_bid(msg.best_bid, msg.bid_amt);
                 Ok(triggers)
             }
         }

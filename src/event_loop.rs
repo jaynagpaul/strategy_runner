@@ -38,5 +38,5 @@ fn test_basic() {
 
     let event = event_loop.poll();
 
-    assert_eq!(event, DataPacket::new());
+    assert_eq!(event.channel, "Channel-1".to_string());
 }
