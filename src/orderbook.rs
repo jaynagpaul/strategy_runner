@@ -3,6 +3,7 @@ use enumset::EnumSet;
 use ordered_float::OrderedFloat;
 use std::collections::BTreeMap;
 
+#[derive(Default)]
 pub struct Orderbook {
     bids: BTreeMap<OrderedFloat<f64>, f64>,
     asks: BTreeMap<OrderedFloat<f64>, f64>,
