@@ -9,7 +9,7 @@ impl StrategyFn for TestStrategy {
     }
 
     fn triggers(&self) -> Triggers {
-        Event::BtcUpdate | Event::EthUpdate
+        Event::NewHighBid | Event::NewLowAsk
     }
 }
 
