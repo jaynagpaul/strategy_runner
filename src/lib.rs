@@ -10,8 +10,5 @@ mod triggers;
 pub use error::*;
 pub use strategy_runner::*;
 pub use strategy_state::*;
-pub use triggers::*;
-
-pub(crate) use stubs::*;
-
 pub use stubs::ExchangeListener;
+pub use triggers::*;

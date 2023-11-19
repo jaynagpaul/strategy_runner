@@ -35,7 +35,7 @@ impl ExchangeListener {
 
         let x = rng.gen_bool(0.000001);
 
-        if (!x) {
+        if !x {
             return None;
         }
 
