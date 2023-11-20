@@ -7,7 +7,7 @@ use std::collections::Queue;
 pub struct Trade {
     amount : f64,
     price: f64,
-    direction : bool,
+    direction : bool, // should probably change to string
 }
 
 #[derive(Default)]
