@@ -1,8 +1,7 @@
 use crate::{
     background_manager::{BackgroundManager, BackgroundMessage},
     event_loop::EventLoop,
-    stubs::DataEnum,
-    stubs::DataPacket,
+    stubs::*,
     Error, ExchangeListener, StrategyState, Triggers,
 };
 
@@ -63,14 +62,50 @@ impl StrategyRunner {
     }
 
     fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
-        match &data.data {
-            DataEnum::MBP(msg) => {
-                match &data.exchange {
-                    type
+        match &data.exchange {
+            ExchangeEnum::Huobi => {
+                match &data.symbol_pair {
+                    SymbolEnum::BTCUSD => {
+                        match &data.data {
+                            DataEnum::MBP(msg) => {
+                                let triggers = self.state.huobi_btc_orderbook.update_ask(msg.bestask, msg.askamount) 
+                                    | self.state.huobi_btc_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                Ok(triggers)
+                            }
+                        }
+                    }
+                    SymbolEnum::ETHUSD => {
+                        match &data.data {
+                            DataEnum::MBP(msg) => {
+                                let triggers = self.state.huobi_eth_orderbook.update_ask(msg.bestask, msg.askamount) 
+                                    | self.state.huobi_eth_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                Ok(triggers)
+                            }
+                        }
+                    }
                 }
-                let triggers = self.state.orderbook.update_ask(msg.bestask, msg.askamount) 
-                    | self.state.orderbook.update_bid(msg.bestbid, msg.bidamount);
-                Ok(triggers)
+            }
+            ExchangeEnum::Binance => {
+                match &data.symbol_pair {
+                    SymbolEnum::BTCUSD => {
+                        match &data.data {
+                            DataEnum::MBP(msg) => {
+                                let triggers = self.state.binance_btc_orderbook.update_ask(msg.bestask, msg.askamount) 
+                                    | self.state.binance_btc_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                Ok(triggers)
+                            }
+                        }
+                    }
+                    SymbolEnum::ETHUSD => {
+                        match &data.data {
+                            DataEnum::MBP(msg) => {
+                                let triggers = self.state.binance_eth_orderbook.update_ask(msg.bestask, msg.askamount) 
+                                    | self.state.binance_eth_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                Ok(triggers)
+                            }
+                        }
+                    }   
+                }
             }
             // DataEnum::RBA(msg) => {
             //     let triggers = 

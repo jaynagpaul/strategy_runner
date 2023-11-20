@@ -13,7 +13,7 @@ impl Orderbook {
     pub fn lowest_ask(&self) -> Option<f64> {
         self.asks.keys().next().map(|x| x.into_inner())
     }
-
+    
     pub fn update_bid(&mut self, best_bid: f64, bid_amt: f64) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
         let best_bid = OrderedFloat(best_bid);
