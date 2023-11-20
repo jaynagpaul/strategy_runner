@@ -64,6 +64,17 @@ impl StrategyRunner {
 
     fn update_state(&mut self, data: &DataPacket) -> Result<Triggers, Error> {
         match &data.data {
+            DataEnum::MBP(msg) => {
+                match &data.exchange {
+                    type
+                }
+                let triggers = self.state.orderbook.update_ask(msg.bestask, msg.askamount) 
+                    | self.state.orderbook.update_bid(msg.bestbid, msg.bidamount);
+                Ok(triggers)
+            }
+            // DataEnum::RBA(msg) => {
+            //     let triggers = 
+            // }
             // todo: new match shit
 
 
