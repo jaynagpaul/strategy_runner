@@ -6,6 +6,7 @@ mod strategy_runner;
 mod strategy_state;
 mod stubs;
 mod triggers;
+mod data_structure;
 
 pub use error::*;
 pub use strategy_runner::*;

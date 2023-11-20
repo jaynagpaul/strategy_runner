@@ -9,12 +9,17 @@ impl StrategyFn for TestStrategy {
         self.0 += 1;
         println!("Strategy has run {} times", self.0);
 
-        println!("New Low Ask {}", state.orderbook.lowest_ask().unwrap());
+        if !(triggers | Event::NewBinanceBTCLowAsk).is_empty() {
+            println!("New Low Ask {}", state.binance_btc_orderbook.lowest_ask().unwrap());
+        }
+        if !(triggers | Event::NewBinanceBTCHighBid).is_empty() {
+            println!("New High Bid {}", state.binance_btc_orderbook.best_bid().unwrap());
+        }
         Ok(())
     }
 
     fn triggers(&self) -> Triggers {
-        Event::NewLowAsk | Event::NewHighBid
+        Event::NewBinanceBTCLowAsk | Event::NewBinanceBTCHighBid
     }
 }
 

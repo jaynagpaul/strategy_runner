@@ -1,5 +1,7 @@
-use stubs::DataPacket
+use crate::stubs::*;
+use crate::Event;
+use enumset::{EnumSet, EnumSetType};
 
-pub trait DataSturcture {
-    pub fn update(&mut self, dp : DataPacket) -> Result<(), Error>;
+pub trait DataStructure {
+    fn update(&mut self, dp : &DataPacket) -> EnumSet<Event>;
 }

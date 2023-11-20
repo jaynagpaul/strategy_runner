@@ -2,6 +2,8 @@ use crate::{
     background_manager::{BackgroundManager, BackgroundMessage},
     event_loop::EventLoop,
     stubs::*,
+    triggers::Event,
+    data_structure::DataStructure,
     Error, ExchangeListener, StrategyState, Triggers,
 };
 
@@ -68,8 +70,19 @@ impl StrategyRunner {
                     SymbolEnum::BTCUSD => {
                         match &data.data {
                             DataEnum::MBP(msg) => {
-                                let triggers = self.state.huobi_btc_orderbook.update_ask(msg.bestask, msg.askamount) 
-                                    | self.state.huobi_btc_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                let mut triggers = self.state.huobi_btc_orderbook.update(data);
+                                if !(triggers | Event::NewBid).is_empty() {
+                                    triggers.insert(Event::NewHuobiBTCBid);
+                                }
+                                if !(triggers | Event::NewHighBid).is_empty() {
+                                    triggers.insert(Event::NewHuobiBTCHighBid);
+                                }
+                                if !(triggers | Event::NewAsk).is_empty() {
+                                    triggers.insert(Event::NewHuobiBTCAsk);
+                                }
+                                if !(triggers | Event::NewLowAsk).is_empty() {
+                                    triggers.insert(Event::NewHuobiBTCLowAsk);
+                                }
                                 Ok(triggers)
                             }
                         }
@@ -77,8 +90,19 @@ impl StrategyRunner {
                     SymbolEnum::ETHUSD => {
                         match &data.data {
                             DataEnum::MBP(msg) => {
-                                let triggers = self.state.huobi_eth_orderbook.update_ask(msg.bestask, msg.askamount) 
-                                    | self.state.huobi_eth_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                let mut triggers = self.state.huobi_eth_orderbook.update(data);
+                                if !(triggers | Event::NewBid).is_empty() {
+                                    triggers.insert(Event::NewHuobiETHBid);
+                                }
+                                if !(triggers | Event::NewHighBid).is_empty() {
+                                    triggers.insert(Event::NewHuobiETHHighBid);
+                                }
+                                if !(triggers | Event::NewAsk).is_empty() {
+                                    triggers.insert(Event::NewHuobiETHAsk);
+                                }
+                                if !(triggers | Event::NewLowAsk).is_empty() {
+                                    triggers.insert(Event::NewHuobiETHLowAsk);
+                                }
                                 Ok(triggers)
                             }
                         }
@@ -90,8 +114,19 @@ impl StrategyRunner {
                     SymbolEnum::BTCUSD => {
                         match &data.data {
                             DataEnum::MBP(msg) => {
-                                let triggers = self.state.binance_btc_orderbook.update_ask(msg.bestask, msg.askamount) 
-                                    | self.state.binance_btc_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                let mut triggers = self.state.binance_btc_orderbook.update(data);
+                                if !(triggers | Event::NewBid).is_empty() {
+                                    triggers.insert(Event::NewBinanceBTCBid);
+                                }
+                                if !(triggers | Event::NewHighBid).is_empty() {
+                                    triggers.insert(Event::NewBinanceBTCHighBid);
+                                }
+                                if !(triggers | Event::NewAsk).is_empty() {
+                                    triggers.insert(Event::NewBinanceBTCAsk);
+                                }
+                                if !(triggers | Event::NewLowAsk).is_empty() {
+                                    triggers.insert(Event::NewBinanceBTCLowAsk);
+                                }
                                 Ok(triggers)
                             }
                         }
@@ -99,19 +134,25 @@ impl StrategyRunner {
                     SymbolEnum::ETHUSD => {
                         match &data.data {
                             DataEnum::MBP(msg) => {
-                                let triggers = self.state.binance_eth_orderbook.update_ask(msg.bestask, msg.askamount) 
-                                    | self.state.binance_eth_orderbook.update_bid(msg.bestbid, msg.bidamount);
+                                let mut triggers = self.state.binance_eth_orderbook.update(data);
+                                if !(triggers | Event::NewBid).is_empty() {
+                                    triggers.insert(Event::NewBinanceETHBid);
+                                }
+                                if !(triggers | Event::NewHighBid).is_empty() {
+                                    triggers.insert(Event::NewBinanceETHHighBid);
+                                }
+                                if !(triggers | Event::NewAsk).is_empty() {
+                                    triggers.insert(Event::NewBinanceETHAsk);
+                                }
+                                if !(triggers | Event::NewLowAsk).is_empty() {
+                                    triggers.insert(Event::NewBinanceETHLowAsk);
+                                }
                                 Ok(triggers)
                             }
                         }
                     }   
                 }
             }
-            // DataEnum::RBA(msg) => {
-            //     let triggers = 
-            // }
-            // todo: new match shit
-
 
             // DataEnum::M1(msg) => {
             //     let triggers = self.state.orderbook.update_ask(msg.best_ask, msg.ask_amt);
