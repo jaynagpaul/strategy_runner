@@ -17,7 +17,7 @@ impl EventLoop {
 
         loop {
             for listener in &mut self.listeners {
-                match listener.next() {
+                match listener.poll() {
                     None => continue,
                     Some(event) => {
                         return event;

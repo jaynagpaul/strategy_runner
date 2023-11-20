@@ -7,3 +7,4 @@ edition = "2021"
 enumset = "1.1.3"
 ordered-float = "2.0"
 rand = "0.8.5"
+market_connection_library = { path = "../MarketConnectionLibrary/Project", version = "0.1.0" }
