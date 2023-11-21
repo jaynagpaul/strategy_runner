@@ -9,6 +9,8 @@ use crate::stubs::*;
 pub struct Orderbook {
     bids: BTreeMap<OrderedFloat<f64>, f64>,
     asks: BTreeMap<OrderedFloat<f64>, f64>,
+    awaiting_refresh: bool, // initially false
+    last_timestamp: i64, // initially -1
 }
 
 impl Orderbook {
@@ -49,6 +51,16 @@ impl Orderbook {
 
         self.asks.insert(best_ask, ask_amt);
         triggers.insert(Event::NewAsk);
+
+        triggers
+    }
+
+    pub fn update_market_incremental(&mut self, timestamp: i64, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
+        let mut triggers = EnumSet::new();
+        let start_time = timestamp - asks.len();
+        if start_time >= last_timestamp {
+            
+        }
 
         triggers
     }
