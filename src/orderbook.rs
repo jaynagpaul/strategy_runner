@@ -91,3 +91,9 @@ impl DataStructure for Orderbook {
         triggers
     }
 }
+
+// TODO:
+// - Need to discuss what datapackets will look like exactly
+// - BTreeMap doesn't allow for easy deletion
+// - Is the queue necessary?
+// - Should we use generic DataStructure trait?
