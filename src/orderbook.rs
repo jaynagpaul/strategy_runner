@@ -11,6 +11,7 @@ pub struct Orderbook {
     asks: BTreeMap<OrderedFloat<f64>, f64>,
     awaiting_refresh: bool, // initially false
     last_timestamp: i64, // initially -1
+    awaiting_packets: Queue<(DataPacket)>,
 }
 
 impl Orderbook {
@@ -29,8 +30,13 @@ impl Orderbook {
             if &best_bid > highest_bid {
                 triggers.insert(Event::NewHighBid);
             }
+            // if &best_bid == highest_bid {
+            //     triggers.insert(Event::NewLowBid);
+            // }
         }
-
+        if bid_amt == 0 {
+            //     I don't believe it is possible to delete from a treemap in logarithmic time... may need to code custom btreemap
+        }
         self.bids.insert(best_bid, bid_amt);
         triggers.insert(Event::NewBid);
 
@@ -57,12 +63,19 @@ impl Orderbook {
 
     pub fn update_market_incremental(&mut self, timestamp: i64, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
         let mut triggers = EnumSet::new();
-        let start_time = timestamp - asks.len();
-        if start_time >= last_timestamp {
-            
-        }
+        if start_time == last_timestamp + 1 {
+            self.last_timestamp = timestamp;
+            for dp in asks.into_iter() { triggers = triggers | self.update_ask(dp.0, dp.1); }
+            for dp in bids.into_iter() { triggers = triggers | self.update_bid(dp.0, dp.1); }
+        } 
+        else if start_time > last_timestamp + 1 {
 
+        }
         triggers
+    }
+
+    pub fn update_refresh(&mut self, timestamp: i64, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
+
     }
 }
 
@@ -70,6 +83,8 @@ impl DataStructure for Orderbook {
     fn update(&mut self, dp : &DataPacket) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
         if let DataEnum::MBP(msg) = &dp.data {
+            // Determine if I need to add to the queue here?
+
             triggers = triggers | self.update_bid(msg.bestbid, msg.bidamount);
             triggers = triggers | self.update_ask(msg.bestask, msg.askamount);
         }
