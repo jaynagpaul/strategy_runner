@@ -21,23 +21,32 @@ pub struct DataPacket {
     pub symbol_pair: SymbolEnum,
     pub channel: String,
     pub timestamp: i64,
+    pub prev_timestamp: i64,
 }
 
 pub enum DataEnum {
     MBP(MarketIncremental),
-    // RBA(RefreshBidAsk),
+    RBA(RefreshBidAsk),
 }
 
 pub struct MarketIncremental {
-    pub bestask: f64,
-    pub askamount: f64,
-    pub bestbid: f64,
-    pub bidamount: f64,
+    pub asks: Vec<(f64, f64)>,
+    pub bids: Vec<(f64, f64)>,
+    pub cur_seq: i64,
+    pub prev_seq: i64,
 }
+
+// pub struct MarketIncremental {
+//     pub bestask: f64,
+//     pub askamount: f64,
+//     pub bestbid: f64,
+//     pub bidamount: f64,
+// }
 
 pub struct RefreshBidAsk {
     pub asks: Vec<(f64, f64)>, //price, amount
     pub bids: Vec<(f64, f64)>, //price, amount
+    pub seq_number: i64, 
 }
 
 pub struct ExchangeListener {}
