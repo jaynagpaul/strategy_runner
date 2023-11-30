@@ -9,8 +9,7 @@ use crate::stubs::*;
 pub struct Orderbook {
     bids: BTreeMap<OrderedFloat<f64>, f64>,
     asks: BTreeMap<OrderedFloat<f64>, f64>,
-    awaiting_refresh: bool, // initially false
-    last_timestamp: i64, // initially -1
+    last_seq: i64, // initially -1
     awaiting_packets: Queue<(DataPacket)>,
 }
 
@@ -88,15 +87,28 @@ impl DataStructure for Orderbook {
         //     DataEnum::MBP(msg)
         //     DataEnum::RBA(msg)
         // }
-        if let DataEnum::MBP(msg) = &dp.data {
-
-            // Determine if I need to add to the queue here?
-            
-            if dp.prev_timestamp > last_timestamp {
-                awaiting_refresh = true;
-                awaiting_packets.add(dp);
+        if let DataEnum::RBA(msg) = &dp.data {
+            if self.last_seq < msg.seq_number {
+                self.last_seq = seq_number;
+                triggers = triggers | update_market_incremental(msg.asks, msg.bids);
             }
-            update_market_incremental(msg.asks, msg.bids);
+        }
+        if let DataEnum::MBP(msg) = &dp.data {
+            awaiting_packets.add(dp);
+        }
+        while self.awaiting_packets.size() > 0 {
+            while awaiting_packets.size() > 0 {
+                if let DataEnum::MBP(msg) = &awaiting_packets.peek() {
+                    if msg.cur_seq < self.last_seq {
+                        continue;
+                    }
+                    else if msg.prev_seq > self.last_seq {
+                        break;
+                    } else {
+                        triggers = triggers | update_market_incremental(msg.asks, msg.bids);
+                    }
+                }
+            }
         }
         triggers
     }
