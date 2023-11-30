@@ -22,71 +22,81 @@ impl Orderbook {
         self.bids.keys().next_back().map(|x| x.into_inner())
     }
 
-    pub fn update_bid(&mut self, best_bid: f64, bid_amt: f64) -> EnumSet<Event> {
+    pub fn update_bid(&mut self, bid_val: f64, bid_amt: f64) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
-        let best_bid = OrderedFloat(best_bid);
+        let bid_val = OrderedFloat(best_bid);
 
         if let Some(highest_bid) = self.bids.keys().next_back() {
-            if &best_bid > highest_bid {
+            if &bid_val > highest_bid {
                 triggers.insert(Event::NewHighBid);
             }
-            // if &best_bid == highest_bid {
-            //     triggers.insert(Event::NewLowBid);
-            // }
         }
         if bid_amt == 0 {
-            //     I don't believe it is possible to delete from a treemap in logarithmic time... may need to code custom btreemap
+            self.bids.remove(bid_val);
+        } else {
+            if !self.bids.contains_key(bid_val) {
+                triggers.insert(Event::NewBid);
+            }
+            self.bids.insert(bid_val, bid_amt);
         }
-        self.bids.insert(best_bid, bid_amt);
-        triggers.insert(Event::NewBid);
 
         triggers
     }
 
-    pub fn update_ask(&mut self, best_ask: f64, ask_amt: f64) -> EnumSet<Event> {
+    pub fn update_ask(&mut self, ask_val: f64, ask_amt: f64) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
-        let best_ask = OrderedFloat(best_ask);
+        let ask_val = OrderedFloat(ask_val);
 
         if let Some(lowest_ask) = self.asks.keys().next() {
-            if &best_ask < lowest_ask {
+            if &ask_val < lowest_ask {
                 triggers.insert(Event::NewLowAsk);
             }
         } else {
             triggers.insert(Event::NewLowAsk);
         }
 
-        self.asks.insert(best_ask, ask_amt);
-        triggers.insert(Event::NewAsk);
+        if ask_amt == 0 {
+            self.asks.remove(ask_val);
+        } else {
+            if !self.asks.contains_key(ask_val) {
+                triggers.insert(Event::NewAsk);
+            }
+            self.asks.insert(ask_val, ask_amt);
+        }
 
         triggers
     }
 
-    pub fn update_market_incremental(&mut self, timestamp: i64, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
+    pub fn update_market_incremental(&mut self, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
         let mut triggers = EnumSet::new();
-        if start_time == last_timestamp + 1 {
-            self.last_timestamp = timestamp;
-            for dp in asks.into_iter() { triggers = triggers | self.update_ask(dp.0, dp.1); }
-            for dp in bids.into_iter() { triggers = triggers | self.update_bid(dp.0, dp.1); }
-        } 
-        else if start_time > last_timestamp + 1 {
-
-        }
+        for dp in asks.into_iter() { triggers = triggers | self.update_ask(dp.0, dp.1); }
+        for dp in bids.into_iter() { triggers = triggers | self.update_bid(dp.0, dp.1); }
         triggers
     }
 
     pub fn update_refresh(&mut self, timestamp: i64, asks: Vec<(f64, f64)>, bids: Vec<(f64, f64)>) -> EnumSet<Event>{
+        let mut triggers = EnumSet::new();
 
+        triggers
     }
 }
 
 impl DataStructure for Orderbook {
     fn update(&mut self, dp : &DataPacket) -> EnumSet<Event> {
         let mut triggers = EnumSet::new();
+        // match &dp.data {
+        //     DataEnum::MBP(msg)
+        //     DataEnum::RBA(msg)
+        // }
         if let DataEnum::MBP(msg) = &dp.data {
-            // Determine if I need to add to the queue here?
 
-            triggers = triggers | self.update_bid(msg.bestbid, msg.bidamount);
-            triggers = triggers | self.update_ask(msg.bestask, msg.askamount);
+            // Determine if I need to add to the queue here?
+            
+            if dp.prev_timestamp > last_timestamp {
+                awaiting_refresh = true;
+                awaiting_packets.add(dp);
+            }
+            update_market_incremental(msg.asks, msg.bids);
         }
         triggers
     }
